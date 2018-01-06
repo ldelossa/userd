@@ -4,6 +4,8 @@ import (
 	"database/sql/driver"
 	"encoding/json"
 	"errors"
+
+	uuid "github.com/google/uuid.git"
 )
 
 type Location struct {
@@ -25,6 +27,10 @@ type User struct {
 	LName      string   `json:"lastName,omitempty"`
 	Location   Location `json:"location,omitempty"`
 	Reputation int      `json:"reputation,omitempty"`
+}
+
+func NewUser() *User {
+	return &User{ID: uuid.New().String()}
 }
 
 // Value implements Valueer interface to marshal object into []byte type before
