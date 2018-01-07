@@ -8,8 +8,8 @@ import (
 	"github.com/gorilla/mux"
 )
 
-// UsersHandler handles operations on the http endpoint: /users for our service.
-func (h *HTTPServer) UsersHandler(w http.ResponseWriter, r *http.Request) {
+// HandleUsers handles operations on the http endpoint: /users for our service.
+func (h *HTTPServer) HandleUsers(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		// Parse username off pattern

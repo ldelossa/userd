@@ -41,7 +41,7 @@ func NewHTTPServer(ds DataStore, port int) *HTTPServer {
 		},
 	}
 
-	r.HandleFunc("/users/{id}", h.UsersHandler).Methods("GET", "DELETE")
-	r.HandleFunc("/users", h.UsersHandler).Methods("POST")
+	r.HandleFunc("/users/{id}", h.HandleUsers).Methods("GET", "DELETE")
+	r.HandleFunc("/users", h.HandleUsers).Methods("POST")
 	return h
 }
