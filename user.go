@@ -29,6 +29,8 @@ type User struct {
 	Reputation int      `json:"reputation,omitempty"`
 }
 
+// NewUser is the constructor for a new user struct. You should call this constructor
+// to populate the unique ID field of a user. Do not create User literal structs
 func NewUser() *User {
 	return &User{ID: uuid.New().String()}
 }
