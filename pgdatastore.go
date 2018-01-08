@@ -7,6 +7,8 @@ import (
 	"fmt"
 
 	"github.com/lib/pq"
+
+	pb "github.com/ldelossa/userd/user"
 )
 
 // PGDataStore implements the DataStore interface.
@@ -51,7 +53,7 @@ func (pgd *PGDataStore) init() error {
 // configured postgresql database. The user object implements the
 // Valuer interface. This interface seralizes the User object into
 // a byte array before placing into the database.
-func (pgd *PGDataStore) AddUser(u *User) error {
+func (pgd *PGDataStore) AddUser(u *pb.User) error {
 	// Issue insert and handle possible errors
 	_, err := pgd.Exec("INSERT INTO users (u) VALUES ($1);", u)
 	if err != nil {
@@ -72,7 +74,7 @@ func (pgd *PGDataStore) AddUser(u *User) error {
 }
 
 // DeleteUserByUsername deletes a user from the configured postgresql database.
-func (pgd *PGDataStore) DeleteUserByID(ID string) error {
+func (pgd *PGDataStore) DeleteUserByID(ID pb.ID) error {
 	// Issue DELETE and handle possible errors
 	res, err := pgd.Exec(NewDeleteUserByIDQuery(ID))
 	affectedRows, _ := res.RowsAffected()
@@ -103,8 +105,8 @@ func (pgd *PGDataStore) DeleteUserByUserName(username string) error {
 
 // GetUserByID retrieves a user by ID, Username, or Email. These fields are expected to be
 // Unique and to only return a single row/document when queries for.
-func (pgd *PGDataStore) GetUserByID(ID string) (*User, error) {
-	u := &User{}
+func (pgd *PGDataStore) GetUserByID(ID pb.ID) (*pb.User, error) {
+	u := &pb.User{Location: &pb.User_Location{}}
 	err := pgd.QueryRow(NewGetUserByIDQuery(ID)).Scan(u)
 	switch {
 	case err == sql.ErrNoRows:
@@ -117,8 +119,8 @@ func (pgd *PGDataStore) GetUserByID(ID string) (*User, error) {
 }
 
 // GetUserByUsername retrieves a user by Username from the configured postgresql database.
-func (pgd *PGDataStore) GetUserByUserName(username string) (*User, error) {
-	u := &User{}
+func (pgd *PGDataStore) GetUserByUserName(username string) (*pb.User, error) {
+	u := &pb.User{Location: &pb.User_Location{}}
 	query := fmt.Sprintf("SELECT u FROM users WHERE u @> '{\"username\":\"%s\"}'", username)
 	err := pgd.QueryRow(query).Scan(u)
 	switch {

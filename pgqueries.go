@@ -3,6 +3,8 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+
+	pb "github.com/ldelossa/userd/user"
 )
 
 // This file contains template query strings. Out impementation
@@ -19,30 +21,31 @@ const (
 	DeleteUserByUsernameTemp = "DELETE FROM users WHERE u @> '%s'"
 )
 
-func NewGetUserByIDQuery(ID string) string {
-	u, _ := json.Marshal(&User{Username: ID})
-	e, _ := json.Marshal(&User{Email: ID})
-	i, _ := json.Marshal(&User{ID: ID})
+func NewGetUserByIDQuery(ID pb.ID) string {
+
+	u, _ := json.Marshal(&pb.User{Username: ID.GetId()})
+	e, _ := json.Marshal(&pb.User{Email: ID.GetId()})
+	i, _ := json.Marshal(&pb.User{Id: ID.GetId()})
 
 	return fmt.Sprintf(GetUserByIDTemp, u, e, i)
 }
 
 func NewGetUserByUsernameQuery(u string) string {
-	un, _ := json.Marshal(&User{Username: u})
+	un, _ := json.Marshal(&pb.User{Username: u})
 
 	return fmt.Sprintf(GetUserByUsernameTemp, un)
 }
 
-func NewDeleteUserByIDQuery(ID string) string {
-	u, _ := json.Marshal(&User{Username: ID})
-	e, _ := json.Marshal(&User{Email: ID})
-	i, _ := json.Marshal(&User{ID: ID})
+func NewDeleteUserByIDQuery(ID pb.ID) string {
+	u, _ := json.Marshal(&pb.User{Username: ID.GetId()})
+	e, _ := json.Marshal(&pb.User{Email: ID.GetId()})
+	i, _ := json.Marshal(&pb.User{Id: ID.GetId()})
 
 	return fmt.Sprintf(DeleteUserByIDTemp, u, e, i)
 }
 
 func NewDeleteUserQuery(username string) string {
-	m, _ := json.Marshal(&User{Username: username})
+	m, _ := json.Marshal(&pb.User{Username: username})
 
 	return fmt.Sprintf(DeleteUserByUsernameTemp, m)
 }

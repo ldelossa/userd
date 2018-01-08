@@ -1,0 +1,40 @@
+syntax = "proto3";
+package user;
+
+// The User service definition
+service UserGRPC {
+  // Add a user to our service
+  rpc AddUser(User) returns (User) {}
+  // Get a user by ID (email, username, unique ID)
+  rpc GetUserByID(ID) returns (User) {}
+  // Delete a user by ID (email, username, unique ID)
+  rpc DeleteUserByID(ID) returns (Response) {}
+}
+
+message User {
+    string id = 1; // Unique ID of user
+    string username = 2; 
+    string password = 3;
+    string email = 4;
+    string fname = 5;
+    string mname = 6;
+    string lname = 7;
+    message Location {
+      string state = 1;
+      string city = 2;
+      int32 zipcode = 3;
+      string phonenumber = 4;
+      float lat = 5;
+      float long = 6;
+    }
+    Location location = 8;
+}
+
+message Response {
+  string id = 1;
+  bool success = 2;
+}
+
+message ID {
+  string id = 1;
+}
