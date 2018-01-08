@@ -14,15 +14,13 @@ It has these top-level messages:
 */
 package user
 
+import proto "github.com/golang/protobuf/proto"
+import fmt "fmt"
+import math "math"
+
 import (
-	"database/sql/driver"
-	"encoding/json"
-	"errors"
-	fmt "fmt"
-
-	proto "github.com/golang/protobuf/proto"
-
-	math "math"
+	context "golang.org/x/net/context"
+	grpc "google.golang.org/grpc"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
@@ -45,28 +43,6 @@ type User struct {
 	Mname    string         `protobuf:"bytes,6,opt,name=mname" json:"mname,omitempty"`
 	Lname    string         `protobuf:"bytes,7,opt,name=lname" json:"lname,omitempty"`
 	Location *User_Location `protobuf:"bytes,8,opt,name=location" json:"location,omitempty"`
-}
-
-// Value implements Valueer interface to marshal object into []byte type before
-// storing into DB.
-func (u User) Value() (driver.Value, error) {
-	j, err := json.Marshal(u)
-	return j, err
-}
-
-// Scan implements Scanner interface to Unmarshal return []byte array from DB into User
-func (u *User) Scan(src interface{}) error {
-	source, ok := src.([]byte)
-	if !ok {
-		return errors.New("Type assertion .([]byte) failed.")
-	}
-
-	err := json.Unmarshal(source, u)
-	if err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func (m *User) Reset()                    { *m = User{} }
@@ -231,6 +207,150 @@ func init() {
 	proto.RegisterType((*User_Location)(nil), "user.User.Location")
 	proto.RegisterType((*Response)(nil), "user.Response")
 	proto.RegisterType((*ID)(nil), "user.ID")
+}
+
+// Reference imports to suppress errors if they are not otherwise used.
+var _ context.Context
+var _ grpc.ClientConn
+
+// This is a compile-time assertion to ensure that this generated file
+// is compatible with the grpc package it is being compiled against.
+const _ = grpc.SupportPackageIsVersion4
+
+// Client API for UserGRPC service
+
+type UserGRPCClient interface {
+	// Add a user to our service
+	AddUser(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error)
+	// Get a user by ID (email, username, unique ID)
+	GetUserByID(ctx context.Context, in *ID, opts ...grpc.CallOption) (*User, error)
+	// Delete a user by ID (email, username, unique ID)
+	DeleteUserByID(ctx context.Context, in *ID, opts ...grpc.CallOption) (*Response, error)
+}
+
+type userGRPCClient struct {
+	cc *grpc.ClientConn
+}
+
+func NewUserGRPCClient(cc *grpc.ClientConn) UserGRPCClient {
+	return &userGRPCClient{cc}
+}
+
+func (c *userGRPCClient) AddUser(ctx context.Context, in *User, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
+	err := grpc.Invoke(ctx, "/user.UserGRPC/AddUser", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userGRPCClient) GetUserByID(ctx context.Context, in *ID, opts ...grpc.CallOption) (*User, error) {
+	out := new(User)
+	err := grpc.Invoke(ctx, "/user.UserGRPC/GetUserByID", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *userGRPCClient) DeleteUserByID(ctx context.Context, in *ID, opts ...grpc.CallOption) (*Response, error) {
+	out := new(Response)
+	err := grpc.Invoke(ctx, "/user.UserGRPC/DeleteUserByID", in, out, c.cc, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// Server API for UserGRPC service
+
+type UserGRPCServer interface {
+	// Add a user to our service
+	AddUser(context.Context, *User) (*User, error)
+	// Get a user by ID (email, username, unique ID)
+	GetUserByID(context.Context, *ID) (*User, error)
+	// Delete a user by ID (email, username, unique ID)
+	DeleteUserByID(context.Context, *ID) (*Response, error)
+}
+
+func RegisterUserGRPCServer(s *grpc.Server, srv UserGRPCServer) {
+	s.RegisterService(&_UserGRPC_serviceDesc, srv)
+}
+
+func _UserGRPC_AddUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(User)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserGRPCServer).AddUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserGRPC/AddUser",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserGRPCServer).AddUser(ctx, req.(*User))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserGRPC_GetUserByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ID)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserGRPCServer).GetUserByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserGRPC/GetUserByID",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserGRPCServer).GetUserByID(ctx, req.(*ID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _UserGRPC_DeleteUserByID_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ID)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserGRPCServer).DeleteUserByID(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/user.UserGRPC/DeleteUserByID",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserGRPCServer).DeleteUserByID(ctx, req.(*ID))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+var _UserGRPC_serviceDesc = grpc.ServiceDesc{
+	ServiceName: "user.UserGRPC",
+	HandlerType: (*UserGRPCServer)(nil),
+	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "AddUser",
+			Handler:    _UserGRPC_AddUser_Handler,
+		},
+		{
+			MethodName: "GetUserByID",
+			Handler:    _UserGRPC_GetUserByID_Handler,
+		},
+		{
+			MethodName: "DeleteUserByID",
+			Handler:    _UserGRPC_DeleteUserByID_Handler,
+		},
+	},
+	Streams:  []grpc.StreamDesc{},
+	Metadata: "user.proto",
 }
 
 func init() { proto.RegisterFile("user.proto", fileDescriptor0) }
