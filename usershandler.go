@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -8,6 +9,7 @@ import (
 	uuid "github.com/google/uuid.git"
 	"github.com/gorilla/mux"
 
+	"github.com/golang/protobuf/jsonpb"
 	pb "github.com/ldelossa/userd/user"
 )
 
@@ -31,17 +33,20 @@ func (h *HTTPServer) HandleUsers(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// return user json
-		js, err := json.Marshal(u)
+		// js, err := json.Marshal(u)
+		var j *bytes.Buffer
+		marshaler := jsonpb.Marshaler{}
+		marshaler.Marshal(j, u)
 		w.Header().Set("Content-Type", "application/json")
-		w.Write(js)
+		w.Write(j.Bytes())
 		return
 
 	case http.MethodPost:
 		// Attempt to unmarshall request data into user struct
 		decoder := json.NewDecoder(r.Body)
 		u := &pb.User{Location: &pb.User_Location{}}
-		err := decoder.Decode(u)
 		u.Id = uuid.New().String()
+		err := jsonpb.UnmarshalNext(decoder, u)
 		if err != nil {
 			errMsg := fmt.Sprintf("Json could not be unmarshaled. Error: %s", err.Error())
 			JsonError(w, &Response{Message: errMsg}, http.StatusBadRequest)
@@ -57,8 +62,10 @@ func (h *HTTPServer) HandleUsers(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Display 200 and created user as response
-		j, _ := json.Marshal(u)
-		w.Write(j)
+		var j *bytes.Buffer
+		marshaler := &jsonpb.Marshaler{}
+		marshaler.Marshal(j, u)
+		w.Write(j.Bytes())
 		return
 
 	case http.MethodDelete:

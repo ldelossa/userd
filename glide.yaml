@@ -1,5 +1,6 @@
-package: local/userd
+package: github.com/ldelossa/userd
 import:
   - package: github.com/lib/pq
   - package: github.com/gorilla/mux
   - package: github.com/google/uuid.git
+  - package: google.golang.org/grpc

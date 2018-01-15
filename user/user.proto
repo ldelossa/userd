@@ -2,13 +2,17 @@ syntax = "proto3";
 package user;
 
 // The User service definition
+// All methods in this interface implicitly return an error. 
+// grpc.Errorf method along with error codes will be returned
+// to calling client. The error will be formated with the underlying
+// response from our datastore. 
 service UserGRPC {
   // Add a user to our service
   rpc AddUser(User) returns (User) {}
   // Get a user by ID (email, username, unique ID)
   rpc GetUserByID(ID) returns (User) {}
   // Delete a user by ID (email, username, unique ID)
-  rpc DeleteUserByID(ID) returns (Response) {}
+  rpc DeleteUserByID(ID) returns (Empty) {}
 }
 
 message User {
@@ -30,11 +34,8 @@ message User {
     Location location = 8;
 }
 
-message Response {
-  string id = 1;
-  bool success = 2;
-}
-
 message ID {
   string id = 1;
 }
+
+message Empty{}

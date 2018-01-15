@@ -1,0 +1,1 @@
+- Make datastore methds take a string instead of the protobuf ID structure.
